@@ -3,6 +3,7 @@ package com.bryan.dompetku.controller;
 import com.bryan.dompetku.dto.CategoryRequest;
 import com.bryan.dompetku.dto.CategoryResponse;
 import com.bryan.dompetku.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,12 +39,12 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryResponse create(@RequestBody CategoryRequest request) {
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest request) {
         return categoryService.create(request);
     }
 
     @PutMapping("/{id}")
-    public CategoryResponse update(@PathVariable Long id, @RequestBody CategoryRequest request) {
+    public CategoryResponse update(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
         return categoryService.update(id, request);
     }
 

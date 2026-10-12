@@ -3,10 +3,9 @@ package com.bryan.dompetku.service;
 import com.bryan.dompetku.dto.CategoryRequest;
 import com.bryan.dompetku.dto.CategoryResponse;
 import com.bryan.dompetku.entity.Category;
+import com.bryan.dompetku.exception.ResourceNotFoundException;
 import com.bryan.dompetku.repository.CategoryRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,14 +30,14 @@ public class CategoryService {
     }
 
     public CategoryResponse create(CategoryRequest request) {
-        Category category = new Category(request.name(), request.type());
+        Category category = new Category(request.name().trim(), request.type());
         Category saved = categoryRepository.save(category);
         return CategoryResponse.from(saved);
     }
 
     public CategoryResponse update(Long id, CategoryRequest request) {
         Category category = getCategoryOrThrow(id);
-        category.setName(request.name());
+        category.setName(request.name().trim());
         category.setType(request.type());
         Category saved = categoryRepository.save(category);
         return CategoryResponse.from(saved);
@@ -51,7 +50,6 @@ public class CategoryService {
 
     private Category getCategoryOrThrow(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Kategori dengan id " + id + " tidak ditemukan"));
+                .orElseThrow(() -> new ResourceNotFoundException("Kategori dengan id " + id + " tidak ditemukan"));
     }
 }

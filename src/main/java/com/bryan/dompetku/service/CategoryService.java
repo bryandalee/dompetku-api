@@ -3,8 +3,10 @@ package com.bryan.dompetku.service;
 import com.bryan.dompetku.dto.CategoryRequest;
 import com.bryan.dompetku.dto.CategoryResponse;
 import com.bryan.dompetku.entity.Category;
+import com.bryan.dompetku.exception.ConflictException;
 import com.bryan.dompetku.exception.ResourceNotFoundException;
 import com.bryan.dompetku.repository.CategoryRepository;
+import com.bryan.dompetku.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +15,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final TransactionRepository transactionRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, TransactionRepository transactionRepository) {
         this.categoryRepository = categoryRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public List<CategoryResponse> findAll() {
@@ -45,6 +49,11 @@ public class CategoryService {
 
     public void delete(Long id) {
         Category category = getCategoryOrThrow(id);
+        long usedCount = transactionRepository.countByCategoryId(id);
+        if (usedCount > 0) {
+            throw new ConflictException(
+                    "Kategori tidak bisa dihapus karena masih dipakai oleh " + usedCount + " transaksi");
+        }
         categoryRepository.delete(category);
     }
 

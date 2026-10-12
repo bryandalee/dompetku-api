@@ -8,4 +8,5 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     List<Transaction> findAllByOrderByTransactionDateDescIdDesc();
+    long countByCategoryId(Long categoryId);
 }

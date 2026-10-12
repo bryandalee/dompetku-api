@@ -1,21 +1,14 @@
 package com.bryan.dompetku.controller;
 
+import com.bryan.dompetku.dto.PageResponse;
 import com.bryan.dompetku.dto.TransactionRequest;
 import com.bryan.dompetku.dto.TransactionResponse;
 import com.bryan.dompetku.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.YearMonth;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -28,8 +21,12 @@ public class TransactionController {
     }
 
     @GetMapping
-    public List<TransactionResponse> findAll() {
-        return transactionService.findAll();
+    public PageResponse<TransactionResponse> findAll(
+            @RequestParam(required = false) YearMonth month,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return transactionService.findAll(month, categoryId, page, size);
     }
 
     @GetMapping("/{id}")

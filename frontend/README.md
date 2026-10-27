@@ -1,16 +1,35 @@
-# React + Vite
+# DompetKu Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Frontend React untuk DompetKu, aplikasi pencatat keuangan pribadi. Backend-nya ada di root repo ini
+(lihat [README utama](../README.md)).
 
-Currently, two official plugins are available:
+## Fitur
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Daftar dan masuk akun (token JWT disimpan di browser)
+- Ringkasan bulanan: saldo, pemasukan, pengeluaran, grafik per kategori, status budget
+- Daftar transaksi dengan filter bulan dan kategori, pagination, tambah, ubah, dan hapus
+- Kelola kategori dan budget per kategori
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+React 19, Vite, React Router, Tailwind CSS 4, Recharts.
 
-## Expanding the Oxlint configuration
+## Menjalankan di komputer sendiri
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Butuh Node.js 24 dan backend yang sedang berjalan di `localhost:8080`.
+
+```bash
+npm install
+npm run dev
+```
+
+Buka http://localhost:5173. Alamat backend diatur lewat variabel `VITE_API_URL` di file `.env.development`.
+
+## Build untuk produksi
+
+```bash
+npm run build
+```
+
+Hasilnya ada di folder `dist/`. Saat deploy di Vercel, isi `VITE_API_URL` dengan alamat backend online,
+dan set **Root Directory** ke `frontend`.

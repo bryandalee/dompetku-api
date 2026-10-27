@@ -6,6 +6,7 @@ import com.bryan.dompetku.entity.Category;
 import com.bryan.dompetku.entity.User;
 import com.bryan.dompetku.exception.ConflictException;
 import com.bryan.dompetku.exception.ResourceNotFoundException;
+import com.bryan.dompetku.repository.BudgetRepository;
 import com.bryan.dompetku.repository.CategoryRepository;
 import com.bryan.dompetku.repository.TransactionRepository;
 import com.bryan.dompetku.repository.UserRepository;
@@ -21,13 +22,16 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final BudgetRepository budgetRepository;
 
     public CategoryService(CategoryRepository categoryRepository,
                            TransactionRepository transactionRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           BudgetRepository budgetRepository) {
         this.categoryRepository = categoryRepository;
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
+        this.budgetRepository = budgetRepository;
     }
 
     public List<CategoryResponse> findAll(Long userId) {
@@ -73,6 +77,7 @@ public class CategoryService {
             throw new ConflictException(
                     "Kategori tidak bisa dihapus karena masih dipakai oleh " + usedCount + " transaksi");
         }
+        budgetRepository.deleteByCategoryId(id);
         categoryRepository.delete(category);
     }
 

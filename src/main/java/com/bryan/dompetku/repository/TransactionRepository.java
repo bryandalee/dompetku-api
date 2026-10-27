@@ -11,25 +11,32 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     @EntityGraph(attributePaths = "category")
-    Page<Transaction> findByTransactionDateBetween(LocalDate start, LocalDate end, Pageable pageable);
+    Page<Transaction> findByUserIdAndTransactionDateBetween(
+            Long userId, LocalDate start, LocalDate end, Pageable pageable);
 
     @EntityGraph(attributePaths = "category")
-    Page<Transaction> findByCategoryIdAndTransactionDateBetween(
-            Long categoryId, LocalDate start, LocalDate end, Pageable pageable);
+    Page<Transaction> findByUserIdAndCategoryIdAndTransactionDateBetween(
+            Long userId, Long categoryId, LocalDate start, LocalDate end, Pageable pageable);
+
+    @EntityGraph(attributePaths = "category")
+    Optional<Transaction> findByIdAndUserId(Long id, Long userId);
 
     long countByCategoryId(Long categoryId);
 
     @Query("""
-        select new com.bryan.dompetku.dto.CategorySummary(c.id, c.name, c.type, sum(t.amount))
-        from Transaction t
-        join t.category c
-        where t.transactionDate between :start and :end
-        group by c.id, c.name, c.type
-        order by sum(t.amount) desc
-        """)
-    List<CategorySummary> summarizeByCategory(@Param("start") LocalDate start, @Param("end") LocalDate end);
+            select new com.bryan.dompetku.dto.CategorySummary(c.id, c.name, c.type, sum(t.amount))
+            from Transaction t
+            join t.category c
+            where t.user.id = :userId
+              and t.transactionDate between :start and :end
+            group by c.id, c.name, c.type
+            order by sum(t.amount) desc
+            """)
+    List<CategorySummary> summarizeByCategory(
+            @Param("userId") Long userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
 }

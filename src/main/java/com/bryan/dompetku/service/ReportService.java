@@ -21,10 +21,10 @@ public class ReportService {
         this.transactionRepository = transactionRepository;
     }
 
-    public MonthlySummaryResponse getMonthlySummary(YearMonth month) {
+    public MonthlySummaryResponse getMonthlySummary(Long userId, YearMonth month) {
         YearMonth selectedMonth = (month != null) ? month : YearMonth.now();
         List<CategorySummary> categories = transactionRepository.summarizeByCategory(
-                selectedMonth.atDay(1), selectedMonth.atEndOfMonth());
+                userId, selectedMonth.atDay(1), selectedMonth.atEndOfMonth());
 
         BigDecimal totalIncome = BigDecimal.ZERO;
         BigDecimal totalExpense = BigDecimal.ZERO;

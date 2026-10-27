@@ -34,14 +34,19 @@ public class Transaction {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     protected Transaction() {
     }
 
-    public Transaction(BigDecimal amount, LocalDate transactionDate, String note, Category category) {
+    public Transaction(BigDecimal amount, LocalDate transactionDate, String note, Category category, User user) {
         this.amount = amount;
         this.transactionDate = transactionDate;
         this.note = note;
         this.category = category;
+        this.user = user;
     }
 
     public Long getId() {
@@ -78,5 +83,9 @@ public class Transaction {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

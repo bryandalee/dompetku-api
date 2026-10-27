@@ -1,7 +1,10 @@
 package com.bryan.dompetku.controller;
 
 import com.bryan.dompetku.dto.MonthlySummaryResponse;
+import com.bryan.dompetku.security.CurrentUser;
 import com.bryan.dompetku.service.ReportService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +23,8 @@ public class ReportController {
     }
 
     @GetMapping("/monthly")
-    public MonthlySummaryResponse getMonthlySummary(@RequestParam(required = false) YearMonth month) {
-        return reportService.getMonthlySummary(month);
+    public MonthlySummaryResponse getMonthlySummary(@AuthenticationPrincipal Jwt jwt,
+                                                    @RequestParam(required = false) YearMonth month) {
+        return reportService.getMonthlySummary(CurrentUser.id(jwt), month);
     }
 }

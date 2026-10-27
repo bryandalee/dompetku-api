@@ -1,16 +1,23 @@
 import { useEffect, useState } from 'react'
+import { SkeletonRows } from '../components/Skeleton.jsx'
 import { api } from '../lib/api'
 
 const TYPE_LABEL = { INCOME: 'Pemasukan', EXPENSE: 'Pengeluaran' }
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState([])
+  // null = belum selesai dimuat; setelah tambah/ubah/hapus daftar lama tetap tampil
+  const [categories, setCategories] = useState(null)
   const [newCategory, setNewCategory] = useState({ name: '', type: 'EXPENSE' })
   const [editing, setEditing] = useState(null)
   const [error, setError] = useState('')
 
   function loadCategories() {
-    api('/api/categories').then(setCategories).catch((err) => setError(err.message))
+    api('/api/categories')
+      .then(setCategories)
+      .catch((err) => {
+        setError(err.message)
+        setCategories((current) => current ?? [])
+      })
   }
 
   useEffect(loadCategories, [])
@@ -81,46 +88,50 @@ export default function CategoriesPage() {
       {['INCOME', 'EXPENSE'].map((type) => (
         <section key={type}>
           <h2 className="mb-3 text-lg font-bold">{TYPE_LABEL[type]}</h2>
-          <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
-            {categories
-              .filter((category) => category.type === type)
-              .map((category) =>
-                editing?.id === category.id ? (
-                  <li key={category.id} className="px-4 py-3">
-                    <form onSubmit={handleUpdate} className="flex flex-wrap items-center gap-2">
-                      <input
-                        className="input min-w-40 flex-1"
-                        value={editing.name}
-                        onChange={(event) => setEditing({ ...editing, name: event.target.value })}
-                        aria-label="Nama kategori"
-                        autoFocus
-                      />
-                      <select
-                        className="input w-auto"
-                        value={editing.type}
-                        onChange={(event) => setEditing({ ...editing, type: event.target.value })}
-                        aria-label="Jenis kategori"
-                      >
-                        <option value="EXPENSE">Pengeluaran</option>
-                        <option value="INCOME">Pemasukan</option>
-                      </select>
-                      <button type="submit" className="btn-primary">Simpan</button>
-                      <button type="button" className="btn-secondary" onClick={() => setEditing(null)}>Batal</button>
-                    </form>
-                  </li>
-                ) : (
-                  <li key={category.id} className="flex items-center justify-between gap-4 px-4 py-3">
-                    <span className="text-sm font-semibold">{category.name}</span>
-                    <div className="flex gap-3">
-                      <button type="button" className="btn-link" onClick={() => setEditing({ ...category })}>Ubah</button>
-                      <button type="button" className="btn-danger-link" onClick={() => handleDelete(category)}>
-                        Hapus
-                      </button>
-                    </div>
-                  </li>
-                ),
-              )}
-          </ul>
+          {categories === null ? (
+            <SkeletonRows count={type === 'INCOME' ? 2 : 4} />
+          ) : (
+            <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+              {categories
+                .filter((category) => category.type === type)
+                .map((category) =>
+                  editing?.id === category.id ? (
+                    <li key={category.id} className="px-4 py-3">
+                      <form onSubmit={handleUpdate} className="flex flex-wrap items-center gap-2">
+                        <input
+                          className="input min-w-40 flex-1"
+                          value={editing.name}
+                          onChange={(event) => setEditing({ ...editing, name: event.target.value })}
+                          aria-label="Nama kategori"
+                          autoFocus
+                        />
+                        <select
+                          className="input w-auto"
+                          value={editing.type}
+                          onChange={(event) => setEditing({ ...editing, type: event.target.value })}
+                          aria-label="Jenis kategori"
+                        >
+                          <option value="EXPENSE">Pengeluaran</option>
+                          <option value="INCOME">Pemasukan</option>
+                        </select>
+                        <button type="submit" className="btn-primary">Simpan</button>
+                        <button type="button" className="btn-secondary" onClick={() => setEditing(null)}>Batal</button>
+                      </form>
+                    </li>
+                  ) : (
+                    <li key={category.id} className="flex items-center justify-between gap-4 px-4 py-3">
+                      <span className="text-sm font-semibold">{category.name}</span>
+                      <div className="flex gap-3">
+                        <button type="button" className="btn-link" onClick={() => setEditing({ ...category })}>Ubah</button>
+                        <button type="button" className="btn-danger-link" onClick={() => handleDelete(category)}>
+                          Hapus
+                        </button>
+                      </div>
+                    </li>
+                  ),
+                )}
+            </ul>
+          )}
         </section>
       ))}
     </div>

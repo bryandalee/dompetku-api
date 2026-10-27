@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Modal from '../components/Modal.jsx'
 import MonthSwitcher from '../components/MonthSwitcher.jsx'
+import { SkeletonRows } from '../components/Skeleton.jsx'
 import TransactionForm from '../components/TransactionForm.jsx'
 import { api } from '../lib/api'
 import { currentMonth, formatDate, formatRupiah } from '../lib/format'
@@ -16,6 +17,7 @@ export default function TransactionsPage() {
   const [editing, setEditing] = useState(null)
   const [reloadKey, setReloadKey] = useState(0)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     api('/api/categories').then(setCategories).catch((err) => setError(err.message))
@@ -27,16 +29,26 @@ export default function TransactionsPage() {
     api(`/api/transactions?${params}`)
       .then(setResult)
       .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
   }, [month, categoryId, page, reloadKey])
 
+  // Skeleton hanya muncul saat isi daftar berganti (bulan, kategori, halaman).
+  // Setelah tambah/ubah/hapus, daftar lama tetap tampil sampai data baru datang.
   function changeMonth(newMonth) {
+    setLoading(true)
     setMonth(newMonth)
     setPage(0)
   }
 
   function changeCategory(newCategoryId) {
+    setLoading(true)
     setCategoryId(newCategoryId)
     setPage(0)
+  }
+
+  function goToPage(newPage) {
+    setLoading(true)
+    setPage(newPage)
   }
 
   async function saveTransaction(payload) {
@@ -92,7 +104,9 @@ export default function TransactionsPage() {
 
       {error && <p className="rounded-lg bg-expense/10 px-4 py-3 text-sm text-expense">{error}</p>}
 
-      {transactions.length === 0 ? (
+      {loading ? (
+        <SkeletonRows count={6} />
+      ) : transactions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line px-6 py-12 text-center">
           <p className="font-semibold">Belum ada transaksi di sini.</p>
           <p className="mt-1 text-sm text-muted">Klik "Tambah transaksi" untuk mencatat yang pertama.</p>
@@ -132,14 +146,14 @@ export default function TransactionsPage() {
             Halaman {result.page + 1} dari {result.totalPages} · {result.totalElements} transaksi
           </span>
           <div className="flex gap-2">
-            <button type="button" className="btn-secondary" disabled={page === 0} onClick={() => setPage(page - 1)}>
+            <button type="button" className="btn-secondary" disabled={page === 0} onClick={() => goToPage(page - 1)}>
               Sebelumnya
             </button>
             <button
               type="button"
               className="btn-secondary"
               disabled={page + 1 >= result.totalPages}
-              onClick={() => setPage(page + 1)}
+              onClick={() => goToPage(page + 1)}
             >
               Berikutnya
             </button>

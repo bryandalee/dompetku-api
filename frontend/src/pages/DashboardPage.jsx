@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import BudgetBar from '../components/BudgetBar.jsx'
 import MonthSwitcher from '../components/MonthSwitcher.jsx'
+import Skeleton, { SkeletonBars, SkeletonRows } from '../components/Skeleton.jsx'
 import { api } from '../lib/api'
 import { currentMonth, formatDate, formatRupiah } from '../lib/format'
 
@@ -14,6 +15,7 @@ export default function DashboardPage() {
   const [budgets, setBudgets] = useState([])
   const [recent, setRecent] = useState([])
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
@@ -28,7 +30,13 @@ export default function DashboardPage() {
         setRecent(transactionPage.content)
       })
       .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
   }, [month])
+
+  function changeMonth(newMonth) {
+    setLoading(true)
+    setMonth(newMonth)
+  }
 
   const expenseData = (summary?.categories ?? [])
     .filter((category) => category.type === 'EXPENSE')
@@ -38,24 +46,36 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Ringkasan</h1>
-        <MonthSwitcher month={month} onChange={setMonth} />
+        <MonthSwitcher month={month} onChange={changeMonth} />
       </header>
 
       {error && <p className="rounded-lg bg-expense/10 px-4 py-3 text-sm text-expense">{error}</p>}
 
       <section className="rounded-2xl bg-brand p-6 text-white sm:p-8">
         <p className="text-sm text-white/75">Saldo bulan ini</p>
-        <p className="amount mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">
-          {formatRupiah(summary?.balance)}
-        </p>
+        {loading ? (
+          <Skeleton light className="mt-2 h-10 w-56 sm:h-12 sm:w-72" />
+        ) : (
+          <p className="amount mt-1 text-4xl font-extrabold tracking-tight sm:text-5xl">
+            {formatRupiah(summary?.balance)}
+          </p>
+        )}
         <div className="mt-6 grid gap-4 border-t border-white/20 pt-5 sm:grid-cols-2">
           <div>
             <p className="text-sm text-white/75">Pemasukan</p>
-            <p className="amount text-xl font-bold">{formatRupiah(summary?.totalIncome)}</p>
+            {loading ? (
+              <Skeleton light className="mt-1 h-7 w-36" />
+            ) : (
+              <p className="amount text-xl font-bold">{formatRupiah(summary?.totalIncome)}</p>
+            )}
           </div>
           <div>
             <p className="text-sm text-white/75">Pengeluaran</p>
-            <p className="amount text-xl font-bold">{formatRupiah(summary?.totalExpense)}</p>
+            {loading ? (
+              <Skeleton light className="mt-1 h-7 w-36" />
+            ) : (
+              <p className="amount text-xl font-bold">{formatRupiah(summary?.totalExpense)}</p>
+            )}
           </div>
         </div>
       </section>
@@ -63,7 +83,16 @@ export default function DashboardPage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <section>
           <h2 className="mb-4 text-lg font-bold">Pengeluaran per kategori</h2>
-          {expenseData.length === 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center gap-4 sm:flex-row lg:flex-col xl:flex-row" aria-busy="true">
+              <Skeleton className="h-48 w-48 shrink-0 rounded-full" />
+              <div className="w-full space-y-3">
+                {[0, 1, 2, 3].map((index) => (
+                  <Skeleton key={index} className="h-4 w-full" />
+                ))}
+              </div>
+            </div>
+          ) : expenseData.length === 0 ? (
             <p className="text-sm text-muted">Belum ada pengeluaran di bulan ini.</p>
           ) : (
             <div className="flex flex-col items-center gap-4 sm:flex-row lg:flex-col xl:flex-row">
@@ -102,7 +131,9 @@ export default function DashboardPage() {
             <h2 className="text-lg font-bold">Budget</h2>
             <Link to="/budgets" className="btn-link">Atur budget</Link>
           </div>
-          {budgets.length === 0 ? (
+          {loading ? (
+            <SkeletonBars />
+          ) : budgets.length === 0 ? (
             <p className="text-sm text-muted">Belum ada budget untuk bulan ini.</p>
           ) : (
             <div className="space-y-5">
@@ -119,7 +150,9 @@ export default function DashboardPage() {
           <h2 className="text-lg font-bold">Transaksi terbaru</h2>
           <Link to="/transactions" className="btn-link">Lihat semua</Link>
         </div>
-        {recent.length === 0 ? (
+        {loading ? (
+          <SkeletonRows count={5} />
+        ) : recent.length === 0 ? (
           <p className="text-sm text-muted">Belum ada transaksi di bulan ini.</p>
         ) : (
           <ul className="divide-y divide-line rounded-2xl border border-line bg-white">

@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: dompetku
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d dompetku"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/dompetku
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: ganti-dengan-secret-panjang-minimal-32-karakter
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
+      SHOW_SQL: "false"
+      SPRING_PROFILES_ACTIVE: demo
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data:

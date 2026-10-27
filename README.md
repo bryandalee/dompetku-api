@@ -5,6 +5,15 @@ Backend REST API dibangun dengan **Java 25** dan **Spring Boot 4**, frontend den
 
 ![CI](https://github.com/bryandalee/dompetku-api/actions/workflows/ci.yml/badge.svg)
 
+## Demo
+
+- **Aplikasi web:** https://dompetku-iota-wine.vercel.app
+- **Swagger UI:** https://dompetkuapi-bh0u9t60.back4.app/swagger-ui/index.html
+- **Akun demo:** `demo@dompetku.com` / `demo12345`
+
+Frontend di-deploy di Vercel, backend (Docker) di Back4app Containers, dan database PostgreSQL di Neon.
+Akses pertama bisa sedikit lambat karena server gratis.
+
 ## Fitur
 
 - Register dan login dengan **JWT**; setiap user hanya bisa melihat datanya sendiri

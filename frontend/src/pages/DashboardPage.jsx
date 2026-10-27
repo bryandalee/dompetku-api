@@ -66,7 +66,7 @@ export default function DashboardPage() {
           {expenseData.length === 0 ? (
             <p className="text-sm text-muted">Belum ada pengeluaran di bulan ini.</p>
           ) : (
-            <div className="flex flex-col items-center gap-4 sm:flex-row">
+            <div className="flex flex-col items-center gap-4 sm:flex-row lg:flex-col xl:flex-row">
               <div className="h-48 w-48 shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -79,17 +79,17 @@ export default function DashboardPage() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <ul className="w-full space-y-2">
+              <ul className="w-full min-w-0 space-y-2 sm:flex-1 lg:w-full lg:flex-none xl:flex-1">
                 {expenseData.map((entry, index) => (
                   <li key={entry.name} className="flex items-center justify-between gap-3 text-sm">
-                    <span className="flex items-center gap-2">
+                    <span className="flex min-w-0 items-center gap-2">
                       <span
-                        className="h-2.5 w-2.5 rounded-full"
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
                       />
-                      {entry.name}
+                      <span className="truncate">{entry.name}</span>
                     </span>
-                    <span className="amount font-semibold">{formatRupiah(entry.value)}</span>
+                    <span className="amount shrink-0 font-semibold whitespace-nowrap">{formatRupiah(entry.value)}</span>
                   </li>
                 ))}
               </ul>

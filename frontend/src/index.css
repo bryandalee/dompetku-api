@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --color-paper: #f3f5f2;
+  --color-ink: #16211c;
+  --color-muted: #5f6c65;
+  --color-line: #dbe2dd;
+  --color-brand: #135e5a;
+  --color-brand-dark: #0d4542;
+  --color-brand-soft: #e3efed;
+  --color-income: #16794a;
+  --color-expense: #b42318;
+  --color-warn: #b45309;
+}
+
+body {
+  @apply bg-paper font-sans text-ink antialiased;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+}
+
+.input {
+  @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20;
+}
+
+.label {
+  @apply mb-1 block text-sm font-medium text-ink;
+}
+
+.btn-primary {
+  @apply rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-60;
+}
+
+.btn-secondary {
+  @apply rounded-lg border border-line bg-white px-4 py-2 text-sm font-semibold text-ink transition hover:bg-paper;
+}
+
+.btn-link {
+  @apply text-sm font-semibold text-brand hover:underline;
+}
+
+.btn-danger-link {
+  @apply text-sm font-semibold text-expense hover:underline;
+}
